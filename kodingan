@@ -74,6 +74,34 @@ class BookingApp:
         field_type_combo['values'] = ("Lapangan 1", "Lapangan 2", "Lapangan 3")
         field_type_combo.grid(row=3, column=1, padx=5, pady=5)
 
+        if booking:
+            name_entry.insert(0, booking.name)
+            date_entry.insert(0, booking.date)
+            time_entry.insert(0, booking.time_slot)
+            field_type_combo.set(booking.field_type)
+
+        def save_booking():
+            name = name_entry.get()
+            date = date_entry.get()
+            time_slot = time_entry.get()
+            field_type = field_type_combo.get()
+            if not name.replace(' ', '').isalpha():
+                messagebox.showwarning("Warning", "Nama pemesan harus berupa huruf")
+                return
+            if len(date.split('-')) != 3 or not all(part.isdigit() for part in date.split('-')):
+                messagebox.showwarning("Warning", "Format tanggal salah. Gunakan DD-MM-YYYY")
+                return
+            if name and date and time_slot and field_type:
+                if booking:
+                    self.manager.add_booking(new_booking)
+                self.refresh_treeview()
+                window.destroy()
+            else:
+                messagebox.showwarning("Warning", "Semua kotak harus diisi")
+
+        tk.Button(window, text="Simpan", command=save_booking).grid(row=4, columnspan=2, padx=5, pady=5)
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = BookingApp(root)
