@@ -16,3 +16,11 @@ class Booking:
 
     def get_total_price(self):
         return self.get_duration() * 20000
+
+class BookingManager:
+    def __init__(self):
+        self.bookings = []
+
+    def add_booking(self, booking):
+        self.bookings.append(booking)
+
