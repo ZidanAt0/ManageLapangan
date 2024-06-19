@@ -59,6 +59,26 @@ class BookingManager:
         right = [x for x in lst if list(map(int, x.date.split('-'))) > list(map(int, pivot.date.split('-')))]
         return self.quicksort_by_date(left) + middle + self.quicksort_by_date(right)
 
+    def quicksort_by_name(self, lst):
+        if len(lst) <= 1:
+            return lst
+        pivot = lst[len(lst) // 2]
+        left = [x for x in lst if x.name.lower() < pivot.name.lower()]
+        middle = [x for x in lst if x.name.lower() == pivot.name.lower()]
+        right = [x for x in lst if x.name.lower() > pivot.name.lower()]
+        return self.quicksort_by_name(left) + middle + self.quicksort_by_name(right)
+
+    def check_booking_conflict(self, date, time_slot, field_type, ignore_booking=None):
+        for booking in self.bookings:
+            if booking == ignore_booking:
+                continue
+            if booking.date == date and booking.field_type == field_type:
+                booked_start, booked_end = map(int, booking.time_slot.split('-'))
+                new_start, new_end = map(int, time_slot.split('-'))
+                if new_start < booked_end and booked_start < new_end:
+                    return True
+        return False
+
 class BookingApp:
     def __init__(self, root):
         self.manager = BookingManager()
