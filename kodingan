@@ -126,3 +126,145 @@ if __name__ == "__main__":
     app = BookingApp(root)
     root.mainloop()
 
+
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+import csv
+
+
+class Booking:
+    def __init__(self, name, date, time_slot, field_type):
+        self.name = name
+        self.date = date
+        self.time_slot = time_slot
+        self.field_type = field_type
+
+    def get_duration(self):
+        start_time, end_time = map(int, self.time_slot.split('-'))
+        return end_time - start_time
+
+    def get_total_price(self):
+        return self.get_duration() * 20000
+
+class BookingManager:
+    def __init__(self):
+        self.bookings = []
+
+    def add_booking(self, booking):
+        self.bookings.append(booking)
+
+    def delete_booking(self, booking):
+        self.bookings = [b for b in self.bookings if b != booking]
+
+    def update_booking(self, old_booking, new_booking):
+        for i, booking in enumerate(self.bookings):
+            if booking == old_booking:
+                self.bookings[i] = new_booking
+                break
+
+    def get_bookings(self):
+        return self.bookings
+
+    def search_booking_by_name(self, name):
+        return [b for b in self.bookings if b.name.lower() == name.lower()]
+
+    def search_booking(self, name, date, time_slot, field_type):
+        return next((b for b in self.bookings if b.name == name and b.date == date and b.time_slot == time_slot and b.field_type == field_type), None)
+
+    def sort_bookings_by_date(self):
+        self.bookings = self.quicksort_by_date(self.bookings)
+
+    def sort_bookings_by_name(self):
+        self.bookings = self.quicksort_by_name(self.bookings)
+
+    def quicksort_by_date(self, lst):
+        if len(lst) <= 1:
+            return lst
+        pivot = lst[len(lst) // 2]
+        left = [x for x in lst if list(map(int, x.date.split('-'))) < list(map(int, pivot.date.split('-')))]
+        middle = [x for x in lst if list(map(int, x.date.split('-'))) == list(map(int, pivot.date.split('-')))]
+        right = [x for x in lst if list(map(int, x.date.split('-'))) > list(map(int, pivot.date.split('-')))]
+        return self.quicksort_by_date(left) + middle + self.quicksort_by_date(right)
+
+class BookingApp:
+    def __init__(self, root):
+        self.manager = BookingManager()
+        self.root = root
+        self.root.geometry("1100x300")
+        self.root.resizable(False, False)
+        self.root.title("Sistem Manajemen Penjadwalan Lapangan Olahraga")
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.tree = ttk.Treeview(self.root, columns=("Nama", "Tanggal", "Waktu", "Lapangan", "Total Harga"))
+        self.tree.heading("Nama", text="Nama Pemesan")
+        self.tree.heading("Tanggal", text="Tanggal")
+        self.tree.heading("Waktu", text="Waktu")
+        self.tree.heading("Lapangan", text="Lapangan")
+        self.tree.heading("Total Harga", text="Total Harga")
+        self.tree['show'] = 'headings'
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        btn_frame = tk.Frame(self.root)
+        btn_frame.pack(fill=tk.X, expand=True, padx=100, pady=10)
+
+        self.add_btn = tk.Button(btn_frame, text="Tambah Pemesanan", command=self.add_booking)
+        self.add_btn.pack(side=tk.LEFT, padx=10, pady=5)
+
+    def add_booking(self):
+        self.booking_window("Tambah Pemesanan")
+
+    def booking_window(self, title, booking=None):
+        window = tk.Toplevel(self.root)
+        window.title(title)
+
+        tk.Label(window, text="Nama Pemesan").grid(row=0, column=0, padx=5, pady=5)
+        name_entry = tk.Entry(window)
+        name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(window, text="Tanggal (DD-MM-YYYY)").grid(row=1, column=0, padx=5, pady=5)
+        date_entry = tk.Entry(window)
+        date_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Label(window, text="Waktu (HH-HH)").grid(row=2, column=0, padx=5, pady=5)
+        time_entry = tk.Entry(window)
+        time_entry.grid(row=2, column=1, padx=5, pady=5)
+
+        tk.Label(window, text="Lapangan").grid(row=3, column=0, padx=5, pady=5)
+        field_type_var = tk.StringVar()
+        field_type_combo = ttk.Combobox(window, textvariable=field_type_var)
+        field_type_combo['values'] = ("Lapangan 1", "Lapangan 2", "Lapangan 3")
+        field_type_combo.grid(row=3, column=1, padx=5, pady=5)
+
+        if booking:
+            name_entry.insert(0, booking.name)
+            date_entry.insert(0, booking.date)
+            time_entry.insert(0, booking.time_slot)
+            field_type_combo.set(booking.field_type)
+
+        def save_booking():
+            name = name_entry.get()
+            date = date_entry.get()
+            time_slot = time_entry.get()
+            field_type = field_type_combo.get()
+            if not name.replace(' ', '').isalpha():
+                messagebox.showwarning("Warning", "Nama pemesan harus berupa huruf")
+                return
+            if len(date.split('-')) != 3 or not all(part.isdigit() for part in date.split('-')):
+                messagebox.showwarning("Warning", "Format tanggal salah. Gunakan DD-MM-YYYY")
+                return
+            if name and date and time_slot and field_type:
+                if booking:
+                    self.manager.add_booking(new_booking)
+                self.refresh_treeview()
+                window.destroy()
+            else:
+                messagebox.showwarning("Warning", "Semua kotak harus diisi")
+
+        tk.Button(window, text="Simpan", command=save_booking).grid(row=4, columnspan=2, padx=5, pady=5)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = BookingApp(root)
+    root.mainloop()
