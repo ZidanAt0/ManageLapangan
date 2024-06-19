@@ -24,3 +24,12 @@ class BookingManager:
     def add_booking(self, booking):
         self.bookings.append(booking)
 
+    def create_widgets(self):
+        self.tree = ttk.Treeview(self.root, columns=("Nama", "Tanggal", "Waktu", "Lapangan", "Total Harga"))
+        self.tree.heading("Nama", text="Nama Pemesan")
+        self.tree.heading("Tanggal", text="Tanggal")
+        self.tree.heading("Waktu", text="Waktu")
+        self.tree.heading("Lapangan", text="Lapangan")
+        self.tree.heading("Total Harga", text="Total Harga")
+        self.tree['show'] = 'headings'
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
