@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import csv
@@ -23,6 +24,24 @@ class BookingManager:
 
     def add_booking(self, booking):
         self.bookings.append(booking)
+
+    def delete_booking(self, booking):
+        self.bookings = [b for b in self.bookings if b != booking]
+
+    def update_booking(self, old_booking, new_booking):
+        for i, booking in enumerate(self.bookings):
+            if booking == old_booking:
+                self.bookings[i] = new_booking
+                break
+
+    def get_bookings(self):
+        return self.bookings
+
+    def search_booking_by_name(self, name):
+        return [b for b in self.bookings if b.name.lower() == name.lower()]
+
+    def search_booking(self, name, date, time_slot, field_type):
+        return next((b for b in self.bookings if b.name == name and b.date == date and b.time_slot == time_slot and b.field_type == field_type), None)
 
 class BookingApp:
     def __init__(self, root):
@@ -106,3 +125,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = BookingApp(root)
     root.mainloop()
+
