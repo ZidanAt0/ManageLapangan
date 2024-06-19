@@ -104,8 +104,22 @@ class BookingApp:
         self.add_btn = tk.Button(btn_frame, text="Tambah Pemesanan", command=self.add_booking)
         self.add_btn.pack(side=tk.LEFT, padx=10, pady=5)
 
+self.delete_btn = tk.Button(btn_frame, text="Hapus Pemesanan", command=self.delete_booking)
+        self.delete_btn.pack(side=tk.LEFT, padx=10, pady=5)
+
     def add_booking(self):
         self.booking_window("Tambah Pemesanan")
+
+def delete_booking(self):
+        selected_item = self.tree.selection()
+        if selected_item:
+            booking_values = self.tree.item(selected_item)['values']
+            booking = self.manager.search_booking(*booking_values[:4])
+            if booking:
+                self.manager.delete_booking(booking)
+                self.refresh_treeview()
+        else:
+            messagebox.showwarning("Warning", "Pilih pemesanan yang ingin dihapus")
 
     def booking_window(self, title, booking=None):
         window = tk.Toplevel(self.root)
