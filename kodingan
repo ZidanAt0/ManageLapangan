@@ -123,6 +123,9 @@ class BookingApp:
         self.sort_name_btn = tk.Button(btn_frame, text="Sort by Name", command=self.sort_by_name)
         self.sort_name_btn.pack(side=tk.LEFT, padx=10, pady=5)
 
+ self.search_btn = tk.Button(btn_frame, text="Cari Pemesan", command=self.search_booking_by_name)
+        self.search_btn.pack(side=tk.LEFT, padx=10, pady=5)
+
     def add_booking(self):
         self.booking_window("Tambah Pemesanan")
 
