@@ -236,6 +236,37 @@ class BookingApp:
 
         tk.Button(window, text="Simpan", command=save_booking).grid(row=4, columnspan=2, padx=5, pady=5)
 
+def search_booking_by_name(self):
+        window = tk.Toplevel(self.root)
+        window.title("Cari Pemesan")
+
+        tk.Label(window, text="Nama Pemesan").grid(row=0, column=0, padx=5, pady=5)
+        name_entry = tk.Entry(window)
+        name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        def search():
+            name = name_entry.get()
+            if name:
+                results = self.manager.search_booking_by_name(name)
+                result_window = tk.Toplevel(window)
+                result_window.title("Hasil Pencarian")
+
+                result_tree = ttk.Treeview(result_window, columns=("Nama", "Tanggal", "Waktu", "Lapangan", "Total Harga"))
+                result_tree.heading("Nama", text="Nama Pemesan")
+                result_tree.heading("Tanggal", text="Tanggal")
+                result_tree.heading("Waktu", text="Waktu")
+                result_tree.heading("Lapangan", text="Lapangan")
+                result_tree.heading("Total Harga", text="Total Harga")
+                result_tree['show'] = 'headings'
+                result_tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+                for booking in results:
+                    total_price = f"Rp{booking.get_total_price():,}"
+                    result_tree.insert("", tk.END, values=(booking.name, booking.date, booking.time_slot, booking.field_type, total_price))
+
+        tk.Button(window, text="Mencari", command=search).grid(row=1, columnspan=2, padx=5, pady=5)
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
